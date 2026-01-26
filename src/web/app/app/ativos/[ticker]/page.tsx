@@ -1,5 +1,5 @@
 "use client";
-
+import { PriceDelayBadge } from "@/components/price-delay-components";
 import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -71,9 +71,9 @@ export default function AtivoDetailPage() {
     targetPrice: "",
   });
 
-  const stockNews = mockNews.filter((n) =>
-    n.tickers.includes(stock.ticker)
-  );
+  const stockNews = stock
+    ? mockNews.filter((n) => n.tickers.includes(stock.ticker))
+    : [];
 
   if (!stock) {
     return (
@@ -162,23 +162,18 @@ export default function AtivoDetailPage() {
             {formatCurrency(stock.price)}
           </p>
           <div className="mt-1 flex items-center gap-2 sm:justify-end">
-            <Badge
-              variant={stock.change >= 0 ? "default" : "destructive"}
-              className="gap-1"
-            >
+            <Badge variant={stock.change >= 0 ? "default" : "destructive"} className="gap-1">
               {stock.change >= 0 ? (
                 <TrendingUp className="h-3 w-3" />
               ) : (
                 <TrendingDown className="h-3 w-3" />
               )}
-              {formatCurrency(Math.abs(stock.change))} (
-              {formatPercent(stock.changePercent)})
+              {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
             </Badge>
           </div>
-          <p className="mt-2 flex items-center gap-1 text-xs text-muted-foreground sm:justify-end">
-            <Clock className="h-3 w-3" />
-            Atualizado: {formatDateTime(stock.lastUpdate)}
-          </p>
+          <div className="mt-2">
+            <PriceDelayBadge lastUpdate={stock.lastUpdate} variant="default" />
+          </div>
         </div>
       </div>
 
@@ -268,19 +263,17 @@ export default function AtivoDetailPage() {
               {alerts.map((alert) => (
                 <div
                   key={alert.id}
-                  className={`flex items-center justify-between rounded-lg border p-4 ${
-                    alert.isActive
+                  className={`flex items-center justify-between rounded-lg border p-4 ${alert.isActive
                       ? "border-border"
                       : "border-border/50 opacity-60"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                        alert.condition === "above"
+                      className={`flex h-10 w-10 items-center justify-center rounded-lg ${alert.condition === "above"
                           ? "bg-accent/10 text-accent"
                           : "bg-destructive/10 text-destructive"
-                      }`}
+                        }`}
                     >
                       {alert.condition === "above" ? (
                         <TrendingUp className="h-5 w-5" />

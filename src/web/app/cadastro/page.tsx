@@ -1,8 +1,6 @@
 "use client";
 
-import React from "react"
-
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,39 +15,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { TrendingUp, Eye, EyeOff, Loader2, AlertTriangle } from "lucide-react";
+
+import { TermsModal } from "@/components/terms-modal";
 
 export default function CadastroPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     acceptTerms: false,
+    acceptDisclaimer: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.acceptTerms) {
-      setShowTermsDialog(true);
+    if (!formData.acceptTerms || !formData.acceptDisclaimer) {
+      setShowTermsModal(true);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas nao coincidem");
+      alert("As senhas não coincidem");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      alert("A senha deve ter pelo menos 8 caracteres");
       return;
     }
 
@@ -60,6 +58,15 @@ export default function CadastroPage() {
 
     setIsLoading(false);
     router.push("/app/dashboard");
+  };
+
+  const handleAcceptTerms = () => {
+    setFormData({
+      ...formData,
+      acceptTerms: true,
+      acceptDisclaimer: true,
+    });
+    setShowTermsModal(false);
   };
 
   return (
@@ -112,7 +119,7 @@ export default function CadastroPage() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="********"
+                  placeholder="Mínimo 8 caracteres"
                   value={formData.password}
                   onChange={(e) =>
                     setFormData({ ...formData, password: e.target.value })
@@ -143,7 +150,7 @@ export default function CadastroPage() {
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="********"
+                placeholder="Digite a senha novamente"
                 value={formData.confirmPassword}
                 onChange={(e) =>
                   setFormData({ ...formData, confirmPassword: e.target.value })
@@ -152,45 +159,65 @@ export default function CadastroPage() {
               />
             </div>
 
-            {/* Terms Warning */}
+            {/* Aviso Compacto */}
             <div className="rounded-lg border border-warning/30 bg-warning/5 p-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
                 <div className="text-sm">
                   <p className="font-medium text-foreground">Aviso importante</p>
                   <p className="mt-1 text-muted-foreground">
-                    Este servico e apenas informativo e nao constitui
-                    recomendacao de investimento. As cotacoes podem apresentar
-                    atraso de 5 a 15 minutos.
+                    Este serviço é apenas informativo e não constitui
+                    recomendação de investimento. Cotações com delay de 5-15 min.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-start space-x-2">
-              <Checkbox
-                id="terms"
-                checked={formData.acceptTerms}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, acceptTerms: checked as boolean })
-                }
-              />
-              <label
-                htmlFor="terms"
-                className="text-sm leading-tight text-muted-foreground"
-              >
-                Li e aceito os{" "}
-                <Link href="/termos" className="text-primary hover:underline">
-                  Termos de Uso
-                </Link>{" "}
-                e a{" "}
-                <Link
-                  href="/privacidade"
-                  className="text-primary hover:underline"
+            {/* Checkboxes de Termos */}
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="terms"
+                  checked={formData.acceptTerms}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, acceptTerms: checked as boolean })
+                  }
+                />
+                <label
+                  htmlFor="terms"
+                  className="cursor-pointer text-sm leading-tight text-muted-foreground"
                 >
-                  Politica de Privacidade
-                </Link>
-              </label>
+                  Li e aceito os{" "}
+                  <button
+                    type="button"
+                    onClick={() => setShowTermsModal(true)}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    Termos de Uso e Política de Privacidade
+                  </button>
+                </label>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="disclaimer"
+                  checked={formData.acceptDisclaimer}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      acceptDisclaimer: checked as boolean,
+                    })
+                  }
+                />
+                <label
+                  htmlFor="disclaimer"
+                  className="cursor-pointer text-sm leading-tight text-muted-foreground"
+                >
+                  Declaro que estou ciente de que este serviço é apenas
+                  informativo, as cotações têm delay de 5-15 min, e não constitui
+                  recomendação de investimento
+                </label>
+              </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
@@ -199,7 +226,7 @@ export default function CadastroPage() {
               Criar conta
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Ja tem uma conta?{" "}
+              Já tem uma conta?{" "}
               <Link href="/login" className="text-primary hover:underline">
                 Entrar
               </Link>
@@ -208,43 +235,20 @@ export default function CadastroPage() {
         </form>
       </Card>
 
-      {/* Terms Dialog */}
-      <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Aceite os termos</DialogTitle>
-            <DialogDescription>
-              Para criar sua conta, voce precisa aceitar os Termos de Uso e a
-              Politica de Privacidade.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="rounded-lg border border-warning/30 bg-warning/5 p-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
-              <div className="text-sm text-muted-foreground">
-                <p>
-                  Este servico e apenas informativo e nao constitui recomendacao
-                  de investimento. As cotacoes podem apresentar atraso de 5 a 15
-                  minutos em relacao ao mercado.
-                </p>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowTermsDialog(false)}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                setFormData({ ...formData, acceptTerms: true });
-                setShowTermsDialog(false);
-              }}
-            >
-              Aceitar e continuar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Modal de Termos Completo */}
+      <TermsModal
+        open={showTermsModal}
+        onOpenChange={setShowTermsModal}
+        onAccept={handleAcceptTerms}
+        acceptedTerms={formData.acceptTerms}
+        onTermsChange={(checked) =>
+          setFormData({ ...formData, acceptTerms: checked })
+        }
+        acceptedDisclaimer={formData.acceptDisclaimer}
+        onDisclaimerChange={(checked) =>
+          setFormData({ ...formData, acceptDisclaimer: checked })
+        }
+      />
     </div>
   );
 }

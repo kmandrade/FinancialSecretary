@@ -37,6 +37,7 @@ import {
   formatDateTime,
 } from "@/lib/mock-data";
 import type { Stock } from "@/lib/types";
+import { PriceDelayBadge } from "@/components/price-delay-components";
 
 export default function AtivosPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -128,14 +129,10 @@ export default function AtivosPage() {
                           <p className="font-medium text-foreground">
                             {formatCurrency(stock.price)}
                           </p>
-                          <Badge
-                            variant={
-                              stock.change >= 0 ? "default" : "destructive"
-                            }
-                            className="gap-1 text-xs"
-                          >
+                          <Badge variant={stock.change >= 0 ? "default" : "destructive"} className="gap-1 text-xs">
                             {formatPercent(stock.changePercent)}
                           </Badge>
+                          <PriceDelayBadge lastUpdate={stock.lastUpdate} variant="compact" />
                         </div>
                       </button>
                     ))

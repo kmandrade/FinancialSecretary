@@ -2,7 +2,7 @@ import React from "react"
 import type { Metadata, Viewport } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import "./globals.css";
+import "../styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
   title: "InvestAlerta - Seu Secretário de Investimentos",
   description:
     "Alertas de preço e resumo diário com IA da sua watchlist de ações brasileiras. Acompanhe PETR4, VALE3 e muito mais.",
-  generator: "v0.app",
   manifest: "/manifest.json",
   keywords: [
     "investimentos",

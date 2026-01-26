@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react"
-
+import { GlobalDelayNotice } from "@/components/price-delay-components";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -165,10 +165,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* Desktop Header */}
       <header className="fixed top-0 right-0 left-64 z-40 hidden h-16 items-center justify-between border-b border-border bg-background px-6 lg:flex">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          <span>Ultima atualizacao: 14:35 (delay ~15 min)</span>
-        </div>
+        <GlobalDelayNotice />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
