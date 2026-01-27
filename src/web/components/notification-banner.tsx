@@ -24,15 +24,26 @@ import {
 
 type NotificationStatus = "default" | "denied" | "granted" | "blocked";
 
+const DISMISS_UNTIL_KEY = "investalerta_notif_banner_dismiss_until_v1";
+const DISMISS_DAYS_DEFAULT = 7;
+
 export function NotificationBanner() {
   const [notificationStatus, setNotificationStatus] =
     useState<NotificationStatus>("default");
   const [showDialog, setShowDialog] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    // Verificar status das notificações
+    const until = Number(localStorage.getItem(DISMISS_UNTIL_KEY) || "0");
+    if (until && Date.now() < until) {
+      setDismissed(true);
+    }
+
     checkNotificationStatus();
+
+    setReady(true);
   }, []);
 
   const checkNotificationStatus = () => {
@@ -45,15 +56,22 @@ export function NotificationBanner() {
     setNotificationStatus(permission as NotificationStatus);
   };
 
+  const dismissForDays = (days = DISMISS_DAYS_DEFAULT) => {
+    const until = Date.now() + days * 24 * 60 * 60 * 1000;
+    localStorage.setItem(DISMISS_UNTIL_KEY, String(until));
+    setDismissed(true);
+  };
+
   const handleRequestPermission = async () => {
     try {
       const permission = await Notification.requestPermission();
       setNotificationStatus(permission as NotificationStatus);
 
       if (permission === "granted") {
-        // Simular registro de push subscription
         console.log("Push notification enabled");
+
         setDismissed(true);
+        localStorage.removeItem(DISMISS_UNTIL_KEY);
       } else if (permission === "denied") {
         setShowDialog(true);
       }
@@ -64,7 +82,6 @@ export function NotificationBanner() {
   };
 
   const handleOpenSettings = () => {
-    // Em produção, isso pode abrir um modal com instruções específicas do navegador
     alert(
       "Para ativar notificações:\n\n" +
         "Chrome/Edge: Clique no ícone de cadeado na barra de endereço → Configurações do site → Notificações → Permitir\n\n" +
@@ -73,7 +90,8 @@ export function NotificationBanner() {
     );
   };
 
-  // Não mostrar se foi dismissado ou se já está ativo
+  if (!ready) return null;
+
   if (dismissed || notificationStatus === "granted") {
     return null;
   }
@@ -94,11 +112,7 @@ export function NotificationBanner() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setDismissed(true)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => dismissForDays(7)}>
               Depois
             </Button>
             <Button size="sm" onClick={handleRequestPermission}>
@@ -132,15 +146,11 @@ export function NotificationBanner() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setDismissed(true)}
+                onClick={() => dismissForDays(7)}
               >
                 <X className="h-4 w-4" />
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleOpenSettings}
-              >
+              <Button size="sm" variant="outline" onClick={handleOpenSettings}>
                 <Settings className="mr-2 h-4 w-4" />
                 Como ativar
               </Button>

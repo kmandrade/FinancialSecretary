@@ -40,6 +40,7 @@ import {
   Trash2,
   ExternalLink,
   Clock,
+  EyeOff,
 } from "lucide-react";
 import {
   mockStocks,
@@ -80,10 +81,10 @@ export default function AtivoDetailPage() {
       <div className="flex min-h-[50vh] items-center justify-center">
         <div className="text-center">
           <h2 className="mb-2 text-xl font-bold text-foreground">
-            Ativo nao encontrado
+            Ativo não encontrado
           </h2>
           <p className="mb-4 text-muted-foreground">
-            O ticker {ticker} nao foi encontrado na base
+            O ticker {ticker} não foi encontrado na base
           </p>
           <Button asChild>
             <Link href="/app/ativos">Voltar aos ativos</Link>
@@ -96,7 +97,7 @@ export default function AtivoDetailPage() {
   const handleAddAlert = () => {
     const price = parseFloat(newAlert.targetPrice);
     if (isNaN(price) || price <= 0) {
-      window.alert("Digite um preco valido");
+      alert("Digite um preço válido");
       return;
     }
 
@@ -128,6 +129,14 @@ export default function AtivoDetailPage() {
     setAlerts(alerts.filter((a) => a.id !== alertId));
   };
 
+  const handleDeactivateStock = () => {
+    if (confirm(`Tem certeza que deseja inativar o monitoramento de ${stock.ticker}?`)) {
+      // Aqui você removeria o ativo da watchlist
+      alert(`${stock.ticker} foi removido da sua watchlist`);
+      router.push("/app/ativos");
+    }
+  };
+
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
       {/* Back button */}
@@ -157,23 +166,35 @@ export default function AtivoDetailPage() {
             <p className="text-muted-foreground">{stock.name}</p>
           </div>
         </div>
-        <div className="text-left sm:text-right">
-          <p className="text-3xl font-bold text-foreground">
-            {formatCurrency(stock.price)}
-          </p>
-          <div className="mt-1 flex items-center gap-2 sm:justify-end">
-            <Badge variant={stock.change >= 0 ? "default" : "destructive"} className="gap-1">
-              {stock.change >= 0 ? (
-                <TrendingUp className="h-3 w-3" />
-              ) : (
-                <TrendingDown className="h-3 w-3" />
-              )}
-              {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
-            </Badge>
+        <div className="flex items-center gap-2">
+          <div className="text-left sm:text-right">
+            <p className="text-3xl font-bold text-foreground">
+              {formatCurrency(stock.price)}
+            </p>
+            <div className="mt-1 flex items-center gap-2 sm:justify-end">
+              <Badge variant={stock.change >= 0 ? "default" : "destructive"} className="gap-1">
+                {stock.change >= 0 ? (
+                  <TrendingUp className="h-3 w-3" />
+                ) : (
+                  <TrendingDown className="h-3 w-3" />
+                )}
+                {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
+              </Badge>
+            </div>
+            <div className="mt-2">
+              <PriceDelayBadge lastUpdate={stock.lastUpdate} variant="default" />
+            </div>
           </div>
-          <div className="mt-2">
-            <PriceDelayBadge lastUpdate={stock.lastUpdate} variant="default" />
-          </div>
+          {/* Botão de Inativar */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleDeactivateStock}
+            className="text-destructive hover:bg-destructive/10"
+          >
+            <EyeOff className="mr-2 h-4 w-4" />
+            Inativar
+          </Button>
         </div>
       </div>
 
@@ -181,9 +202,9 @@ export default function AtivoDetailPage() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Alertas de preco</CardTitle>
+            <CardTitle>Alertas de preço</CardTitle>
             <CardDescription>
-              Receba notificacoes quando o preco atingir seu alvo
+              Receba notificações quando o preço atingir seu alvo
             </CardDescription>
           </div>
           <Dialog open={isAddAlertOpen} onOpenChange={setIsAddAlertOpen}>
@@ -197,12 +218,12 @@ export default function AtivoDetailPage() {
               <DialogHeader>
                 <DialogTitle>Criar alerta para {stock.ticker}</DialogTitle>
                 <DialogDescription>
-                  Preco atual: {formatCurrency(stock.price)}
+                  {stock.name} - Preço atual: {formatCurrency(stock.price)}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Condicao</Label>
+                  <Label>Condição</Label>
                   <Select
                     value={newAlert.condition}
                     onValueChange={(value: "above" | "below") =>
@@ -214,16 +235,16 @@ export default function AtivoDetailPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="above">
-                        Acima de (preco maior ou igual)
+                        Acima de (preço maior ou igual)
                       </SelectItem>
                       <SelectItem value="below">
-                        Abaixo de (preco menor ou igual)
+                        Abaixo de (preço menor ou igual)
                       </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Preco alvo (R$)</Label>
+                  <Label>Preço alvo (R$)</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -255,7 +276,7 @@ export default function AtivoDetailPage() {
                 Nenhum alerta configurado
               </p>
               <p className="text-sm text-muted-foreground">
-                Crie alertas para ser notificado quando o preco atingir seu alvo
+                Crie alertas para ser notificado quando o preço atingir seu alvo
               </p>
             </div>
           ) : (
@@ -315,16 +336,16 @@ export default function AtivoDetailPage() {
       {/* News Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Noticias recentes</CardTitle>
+          <CardTitle>Notícias recentes</CardTitle>
           <CardDescription>
-            Ultimas noticias relacionadas a {stock.ticker}
+            Últimas notícias relacionadas a {stock.ticker}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {stockNews.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-muted-foreground">
-                Nenhuma noticia encontrada para este ativo
+                Nenhuma notícia encontrada para este ativo
               </p>
             </div>
           ) : (

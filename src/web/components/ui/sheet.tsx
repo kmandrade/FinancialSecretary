@@ -44,6 +44,37 @@ function SheetOverlay({
   )
 }
 
+/**
+ * Procura recursivamente por um SheetTitle / Radix Title dentro do children.
+ * Isso evita duplicar título (e leitor de tela não "ler 2 vezes").
+ */
+function containsDialogTitle(node: React.ReactNode): boolean {
+  if (node == null || typeof node === 'boolean') return false
+
+  // Texto puro não tem elementos
+  if (typeof node === 'string' || typeof node === 'number') return false
+
+  // Arrays
+  if (Array.isArray(node)) return node.some(containsDialogTitle)
+
+  // Elementos React
+  if (React.isValidElement(node)) {
+    const el = node as React.ReactElement<any>
+
+    // Se for diretamente o Radix Title
+    if (el.type === SheetPrimitive.Title) return true
+
+    // Se estiver usando o nosso SheetTitle (que seta data-slot="sheet-title")
+    // ou algum wrapper que preserve isso
+    if (el.props?.['data-slot'] === 'sheet-title') return true
+
+    // Fragment / qualquer componente com children internos
+    return containsDialogTitle(el.props?.children)
+  }
+
+  return false
+}
+
 function SheetContent({
   className,
   children,
@@ -52,6 +83,12 @@ function SheetContent({
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left'
 }) {
+  const hasTitle = containsDialogTitle(children)
+
+  // Se o dev já passou aria-label no conteúdo, usamos como fallback do título oculto.
+  const fallbackTitle =
+    (props['aria-label'] as string | undefined) ?? 'Painel'
+
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -71,7 +108,15 @@ function SheetContent({
         )}
         {...props}
       >
+        {/* ✅ Se não existir Title, cria um oculto para acessibilidade */}
+        {!hasTitle ? (
+          <SheetPrimitive.Title className="sr-only">
+            {fallbackTitle}
+          </SheetPrimitive.Title>
+        ) : null}
+
         {children}
+
         <SheetPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none">
           <XIcon className="size-4" />
           <span className="sr-only">Close</span>
