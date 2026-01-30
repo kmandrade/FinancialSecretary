@@ -11,23 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import {
   TrendingUp,
   TrendingDown,
@@ -36,7 +20,6 @@ import {
   Plus,
   ArrowRight,
   History,
-  Bitcoin,
   X,
   Play,
 } from "lucide-react";
@@ -47,47 +30,21 @@ import {
   mockUser,
   formatCurrency,
   formatPercent,
-  formatDateTime,
+  formatDateTime
 } from "@/lib/mock-data";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
 import { NotificationBanner } from "@/components/notification-banner";
 import { PriceDelayBadge } from "@/components/price-delay-components";
-import { toast } from "@/components/ui/custom-toast";
+import { CryptoSection } from "@/components/crypto-section";
 
 export default function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showTutorialBanner, setShowTutorialBanner] = useState(true);
-  const [bitcoinEnabled, setBitcoinEnabled] = useState(false);
-  const [showBitcoinDialog, setShowBitcoinDialog] = useState(false);
-  const [bitcoinAlert, setBitcoinAlert] = useState({
-    condition: "above" as "above" | "below",
-    targetPrice: "",
-  });
-
-  // Dados mockados do Bitcoin
-  const bitcoinData = {
-    ticker: "BTC",
-    name: "Bitcoin",
-    price: 245678.50,
-    change: 3456.20,
-    changePercent: 1.42,
-    lastUpdate: new Date().toISOString(),
-  };
 
   useEffect(() => {
-    // Verificar se usuário já viu o tutorial
+    // Verificar se usuario ja viu o tutorial
     const tutorialDismissed = localStorage.getItem("tutorial_banner_dismissed") === "true";
     setShowTutorialBanner(!tutorialDismissed);
-
-    // Verificar se Bitcoin está ativo
-    const btcActive = localStorage.getItem("bitcoin_alert_active") === "true";
-    setBitcoinEnabled(btcActive);
-
-    // Carregar configuração do Bitcoin se existir
-    const btcConfig = localStorage.getItem("bitcoin_alert_config");
-    if (btcConfig) {
-      setBitcoinAlert(JSON.parse(btcConfig));
-    }
   }, []);
 
   const handleDismissTutorial = () => {
@@ -104,35 +61,6 @@ export default function DashboardPage() {
   const handleOnboardingComplete = () => {
     localStorage.setItem("onboarding_completed", "true");
     setShowOnboarding(false);
-  };
-
-  const handleBitcoinClick = () => {
-    setShowBitcoinDialog(true);
-  };
-
-  const handleBitcoinAlertSave = () => {
-    const price = parseFloat(bitcoinAlert.targetPrice);
-    if (isNaN(price) || price <= 0) {
-      toast.error("Preco invalido", "Digite um preco valido para o alerta");
-      return;
-    }
-
-    // Salvar configuração
-    localStorage.setItem("bitcoin_alert_active", "true");
-    localStorage.setItem("bitcoin_alert_config", JSON.stringify(bitcoinAlert));
-    setBitcoinEnabled(true);
-    setShowBitcoinDialog(false);
-
-    toast.priceUp(
-      "Alerta de Bitcoin configurado!",
-      `Voce sera notificado quando o preco estiver ${bitcoinAlert.condition === "above" ? "acima" : "abaixo"} de ${formatCurrency(price)}`
-    );
-  };
-
-  const handleBitcoinDisable = () => {
-    localStorage.setItem("bitcoin_alert_active", "false");
-    setBitcoinEnabled(false);
-    setShowBitcoinDialog(false);
   };
 
   const recentTriggers = mockAlertHistory.slice(0, 3);
@@ -200,59 +128,8 @@ export default function DashboardPage() {
           </Button>
         </div>
 
-        {/* Bitcoin Alert - Versão Compacta/Expandida */}
-        {!bitcoinEnabled ? (
-          // Bitcoin INATIVO - Versão Minimalista
-          <button
-            onClick={handleBitcoinClick}
-            className="w-full flex items-center gap-3 rounded-lg border border-border bg-muted/30 p-3 transition-colors hover:bg-muted/50 hover:border-primary/30"
-          >
-            <Bitcoin className="h-6 w-6 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              Ativar monitoramento de Bitcoin
-            </span>
-            <Plus className="ml-auto h-4 w-4 text-muted-foreground" />
-          </button>
-        ) : (
-          // Bitcoin ATIVO - Versão Expandida
-          <Card 
-            className="cursor-pointer border-yellow-500/50 bg-yellow-500/5 transition-all hover:shadow-md"
-            onClick={handleBitcoinClick}
-          >
-            <CardContent className="flex items-center gap-4 py-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500/20">
-                <Bitcoin className="h-7 w-7 text-yellow-500" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-foreground">Bitcoin (BTC)</p>
-                  <Badge variant="default" className="bg-yellow-500 hover:bg-yellow-600">
-                    Ativo
-                  </Badge>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Alerta configurado - Clique para editar
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-xl font-bold text-foreground">
-                  {formatCurrency(bitcoinData.price)}
-                </p>
-                <Badge
-                  variant={bitcoinData.change >= 0 ? "default" : "destructive"}
-                  className="gap-1"
-                >
-                  {bitcoinData.change >= 0 ? (
-                    <TrendingUp className="h-3 w-3" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3" />
-                  )}
-                  {formatPercent(bitcoinData.changePercent)}
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {/* Secao de Criptomoedas */}
+        <CryptoSection />
 
         {/* Stats Grid - Mais compacto */}
         <div className="grid gap-4 sm:grid-cols-3">
@@ -500,96 +377,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Bitcoin Alert Dialog */}
-      <Dialog open={showBitcoinDialog} onOpenChange={setShowBitcoinDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Bitcoin className="h-5 w-5 text-yellow-500" />
-              Alerta de Bitcoin
-            </DialogTitle>
-            <DialogDescription>
-              Preço atual: {formatCurrency(bitcoinData.price)}
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Condição</Label>
-              <Select
-                value={bitcoinAlert.condition}
-                onValueChange={(value: "above" | "below") =>
-                  setBitcoinAlert({ ...bitcoinAlert, condition: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="above">
-                    Acima de (preço maior ou igual)
-                  </SelectItem>
-                  <SelectItem value="below">
-                    Abaixo de (preço menor ou igual)
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Preço alvo (R$)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                placeholder="Ex: 250000.00"
-                value={bitcoinAlert.targetPrice}
-                onChange={(e) =>
-                  setBitcoinAlert({
-                    ...bitcoinAlert,
-                    targetPrice: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-3">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">💡 Dica:</strong> Você será
-                notificado quando o Bitcoin atingir o valor definido. O delay pode
-                ser de 5 a 15 minutos.
-              </p>
-            </div>
-          </div>
-
-          <DialogFooter className="flex-col gap-2 sm:flex-row">
-            {bitcoinEnabled && (
-              <Button
-                variant="outline"
-                onClick={handleBitcoinDisable}
-                className="w-full sm:w-auto"
-              >
-                Desativar alerta
-              </Button>
-            )}
-            <div className="flex gap-2 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={() => setShowBitcoinDialog(false)}
-                className="flex-1 sm:flex-none"
-              >
-                Cancelar
-              </Button>
-              <Button 
-                onClick={handleBitcoinAlertSave}
-                className="flex-1 sm:flex-none"
-              >
-                {bitcoinEnabled ? "Atualizar" : "Ativar alerta"}
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
