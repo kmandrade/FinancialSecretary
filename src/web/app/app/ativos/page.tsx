@@ -38,6 +38,7 @@ import {
 } from "@/lib/mock-data";
 import type { Stock } from "@/lib/types";
 import { PriceDelayBadge } from "@/components/price-delay-components";
+import { toast } from "@/components/ui/custom-toast";
 
 export default function AtivosPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,8 +54,9 @@ export default function AtivosPage() {
 
   const addToWatchlist = (stock: Stock) => {
     if (watchlist.length >= mockUser.watchlistLimit) {
-      alert(
-        `Limite de ${mockUser.watchlistLimit} ativos atingido. Faca upgrade do seu plano para adicionar mais.`
+      toast.warning(
+        "Limite atingido",
+        `Voce atingiu o limite de ${mockUser.watchlistLimit} ativos. Faca upgrade do seu plano para adicionar mais.`
       );
       return;
     }

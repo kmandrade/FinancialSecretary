@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { mockStocks, formatCurrency, formatPercent } from "@/lib/mock-data";
 import type { Stock } from "@/lib/types";
+import { toast, showConfirmToast } from "@/components/ui/custom-toast";
 
 interface OnboardingWizardProps {
   open: boolean;
@@ -76,13 +77,13 @@ export function OnboardingWizard({ open, onComplete }: OnboardingWizardProps) {
 
   const handleNextStep = () => {
     if (currentStep === 1 && selectedStocks.length === 0) {
-      alert("Adicione pelo menos 1 ativo para continuar");
+      toast.warning("Selecione um ativo", "Adicione pelo menos 1 ativo para continuar");
       return;
     }
     if (currentStep === 2) {
       const price = parseFloat(alertConfig.targetPrice);
       if (!alertConfig.ticker || isNaN(price) || price <= 0) {
-        alert("Configure um alerta válido para continuar");
+        toast.warning("Alerta incompleto", "Configure um alerta valido para continuar");
         return;
       }
     }
@@ -98,10 +99,10 @@ export function OnboardingWizard({ open, onComplete }: OnboardingWizardProps) {
       
       // Simular sucesso
       setTimeout(() => {
-        alert("Notificações ativadas com sucesso! ✅");
+        toast.success("Notificacoes ativadas", "Voce recebera alertas em tempo real");
       }, 300);
-    } catch (error) {
-      alert("Não foi possível ativar as notificações. Tente novamente.");
+    } catch {
+      toast.error("Erro ao ativar", "Nao foi possivel ativar as notificacoes. Tente novamente.");
     }
   };
 
@@ -110,9 +111,13 @@ export function OnboardingWizard({ open, onComplete }: OnboardingWizardProps) {
   };
 
   const handleSkipOnboarding = () => {
-    if (confirm("Tem certeza que deseja pular o tutorial? Você pode configurar tudo depois.")) {
-      onComplete();
-    }
+    showConfirmToast({
+      title: "Pular tutorial?",
+      description: "Voce pode configurar tudo depois nas configuracoes.",
+      confirmLabel: "Sim, pular",
+      cancelLabel: "Continuar tutorial",
+      onConfirm: () => onComplete(),
+    });
   };
 
   return (

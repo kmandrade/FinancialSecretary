@@ -15,8 +15,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TrendingUp, Eye, EyeOff, Loader2, AlertTriangle } from "lucide-react";
-
+import { TrendingUp, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { toast } from "@/components/ui/custom-toast";
+import { ButtonLoading } from "@/components/ui/loading";
 import { TermsModal } from "@/components/terms-modal";
 
 export default function CadastroPage() {
@@ -42,12 +43,12 @@ export default function CadastroPage() {
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem");
+      toast.error("Erro de validacao", "As senhas nao coincidem");
       return;
     }
 
     if (formData.password.length < 8) {
-      alert("A senha deve ter pelo menos 8 caracteres");
+      toast.error("Erro de validacao", "A senha deve ter pelo menos 8 caracteres");
       return;
     }
 
@@ -57,6 +58,7 @@ export default function CadastroPage() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsLoading(false);
+    toast.success("Conta criada com sucesso!", "Bem-vindo ao InvestAlerta");
     router.push("/app/dashboard");
   };
 
@@ -222,8 +224,14 @@ export default function CadastroPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Criar conta
+              {isLoading ? (
+                <>
+                  <ButtonLoading className="mr-2" />
+                  Criando conta...
+                </>
+              ) : (
+                "Criar conta"
+              )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Já tem uma conta?{" "}

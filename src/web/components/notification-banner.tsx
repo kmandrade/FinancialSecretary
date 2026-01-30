@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { toast } from "@/components/ui/custom-toast";
 
 type NotificationStatus = "default" | "denied" | "granted" | "blocked";
 
@@ -82,12 +83,12 @@ export function NotificationBanner() {
   };
 
   const handleOpenSettings = () => {
-    alert(
-      "Para ativar notificações:\n\n" +
-        "Chrome/Edge: Clique no ícone de cadeado na barra de endereço → Configurações do site → Notificações → Permitir\n\n" +
-        "Firefox: Clique no ícone de cadeado → Configurações de notificações → Permitir\n\n" +
-        "Safari: Preferências → Sites → Notificações → Permitir para este site"
+    toast.info(
+      "Como ativar notificacoes",
+      "Clique no icone de cadeado na barra de endereco, va em Configuracoes do site, e em Notificacoes selecione Permitir.",
+      { duration: 8000 }
     );
+    setShowDialog(true);
   };
 
   if (!ready) return null;

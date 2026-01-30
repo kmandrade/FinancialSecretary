@@ -51,6 +51,7 @@ import {
   formatDateTime,
 } from "@/lib/mock-data";
 import type { Alert } from "@/lib/types";
+import { toast, showConfirmToast } from "@/components/ui/custom-toast";
 
 export default function AtivoDetailPage() {
   const params = useParams();
@@ -97,7 +98,7 @@ export default function AtivoDetailPage() {
   const handleAddAlert = () => {
     const price = parseFloat(newAlert.targetPrice);
     if (isNaN(price) || price <= 0) {
-      alert("Digite um preço válido");
+      toast.error("Preco invalido", "Digite um preco valido para o alerta");
       return;
     }
 
@@ -130,11 +131,16 @@ export default function AtivoDetailPage() {
   };
 
   const handleDeactivateStock = () => {
-    if (confirm(`Tem certeza que deseja inativar o monitoramento de ${stock.ticker}?`)) {
-      // Aqui você removeria o ativo da watchlist
-      alert(`${stock.ticker} foi removido da sua watchlist`);
-      router.push("/app/ativos");
-    }
+    showConfirmToast({
+      title: `Inativar ${stock.ticker}?`,
+      description: "Tem certeza que deseja remover este ativo da sua watchlist?",
+      confirmLabel: "Sim, inativar",
+      cancelLabel: "Cancelar",
+      onConfirm: () => {
+        toast.success("Ativo removido", `${stock.ticker} foi removido da sua watchlist`);
+        router.push("/app/ativos");
+      },
+    });
   };
 
   return (

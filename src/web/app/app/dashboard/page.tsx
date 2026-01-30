@@ -52,6 +52,7 @@ import {
 import { OnboardingWizard } from "@/components/onboarding-wizard";
 import { NotificationBanner } from "@/components/notification-banner";
 import { PriceDelayBadge } from "@/components/price-delay-components";
+import { toast } from "@/components/ui/custom-toast";
 
 export default function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -112,7 +113,7 @@ export default function DashboardPage() {
   const handleBitcoinAlertSave = () => {
     const price = parseFloat(bitcoinAlert.targetPrice);
     if (isNaN(price) || price <= 0) {
-      alert("Digite um preço válido");
+      toast.error("Preco invalido", "Digite um preco valido para o alerta");
       return;
     }
 
@@ -122,7 +123,10 @@ export default function DashboardPage() {
     setBitcoinEnabled(true);
     setShowBitcoinDialog(false);
 
-    alert(`Alerta de Bitcoin configurado! Você será notificado quando o preço estiver ${bitcoinAlert.condition === "above" ? "acima" : "abaixo"} de ${formatCurrency(price)}`);
+    toast.priceUp(
+      "Alerta de Bitcoin configurado!",
+      `Voce sera notificado quando o preco estiver ${bitcoinAlert.condition === "above" ? "acima" : "abaixo"} de ${formatCurrency(price)}`
+    );
   };
 
   const handleBitcoinDisable = () => {

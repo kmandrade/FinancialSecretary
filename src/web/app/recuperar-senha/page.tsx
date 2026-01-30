@@ -14,7 +14,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TrendingUp, Mail, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
+import { TrendingUp, Mail, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { toast } from "@/components/ui/custom-toast";
+import { ButtonLoading } from "@/components/ui/loading";
 
 export default function RecuperarSenhaPage() {
   const router = useRouter();
@@ -36,7 +38,7 @@ export default function RecuperarSenhaPage() {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
     setIsLoading(false);
-    alert("Email reenviado com sucesso!");
+    toast.success("Email reenviado", "Verifique sua caixa de entrada");
   };
 
   return (
@@ -99,8 +101,14 @@ export default function RecuperarSenhaPage() {
               </CardContent>
               <CardFooter className="flex flex-col gap-4">
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Enviar link de recuperação
+                  {isLoading ? (
+                    <>
+                      <ButtonLoading className="mr-2" />
+                      Enviando...
+                    </>
+                  ) : (
+                    "Enviar link de recuperacao"
+                  )}
                 </Button>
                 <p className="text-center text-sm text-muted-foreground">
                   Lembrou sua senha?{" "}
@@ -160,7 +168,7 @@ export default function RecuperarSenhaPage() {
                 onClick={handleResendEmail}
                 disabled={isLoading}
               >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isLoading ? <ButtonLoading className="mr-2" /> : null}
                 Reenviar email
               </Button>
               <Button variant="ghost" className="w-full" asChild>

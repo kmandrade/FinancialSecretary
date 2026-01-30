@@ -38,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { showConfirmToast } from "@/components/ui/custom-toast";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -149,10 +150,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   const handleLogout = () => {
-    if (confirm("Tem certeza que deseja sair?")) {
-      localStorage.clear();
-      router.push("/login");
-    }
+    showConfirmToast({
+      title: "Sair da conta?",
+      description: "Tem certeza que deseja encerrar sua sessao?",
+      confirmLabel: "Sim, sair",
+      cancelLabel: "Cancelar",
+      onConfirm: () => {
+        localStorage.clear();
+        router.push("/login");
+      },
+    });
   };
 
   return (

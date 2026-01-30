@@ -16,7 +16,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { TrendingUp, Eye, EyeOff, Loader2 } from "lucide-react";
+import { TrendingUp, Eye, EyeOff } from "lucide-react";
+import { ButtonLoading } from "@/components/ui/loading";
+import { toast } from "@/components/ui/custom-toast";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function LoginPage() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     setIsLoading(false);
+    toast.success("Login realizado", "Bem-vindo de volta!");
     router.push("/app/dashboard");
   };
 
@@ -111,8 +114,14 @@ export default function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Entrar
+              {isLoading ? (
+                <>
+                  <ButtonLoading className="mr-2" />
+                  Entrando...
+                </>
+              ) : (
+                "Entrar"
+              )}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
               Nao tem uma conta?{" "}
