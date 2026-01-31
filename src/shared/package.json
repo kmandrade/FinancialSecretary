@@ -1,0 +1,18 @@
+{
+  "name": "@investalerta/shared",
+  "version": "1.0.0",
+  "description": "Codigo compartilhado entre API, Worker e Web",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}
