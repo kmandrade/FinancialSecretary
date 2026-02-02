@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "financial-secretary-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-02-01",
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "financial_teste",
+      "database_id": "cb420ae5-d8ea-458f-9bd3-89505176c44f",
+      "remote": true
+    }
+  ],
+
+  "triggers": {
+    "crons": [
+      "*/15 * * * *",
+      "0 * * * *",
+      "10 11 * * *"
+    ]
+  },
+
+  "vars": {
+    "ENV": "dev",
+    "API_BASE_PATH": "/api/v1",
+
+    "PRICE_POLL_INTERVAL_MIN": "15",
+    "NEWS_COLLECTION_HOUR_UTC": "11",
+    "DIGEST_CHECK_INTERVAL_MIN": "60",
+
+    "JWT_ISSUER": "financial-secretary",
+
+    "OPENAI_MODEL": "gpt-4o-mini",
+
+    "PUSH_SUBJECT": "mailto:contato@financialsecretary.app",
+
+    "EMAIL_FROM": "Financial Secretary <no-reply@financialsecretary.app>",
+
+    "APP_BASE_URL": "http://127.0.0.1:8787",
+
+    "TERMS_VERSION": "v1",
+    "TERMS_URL": "https://financialsecretary.app/terms",
+    "CONTACT_EMAIL": "contato@financialsecretary.app",
+
+    "DEFAULT_TIMEZONE": "America/Fortaleza"
+  }
+}
