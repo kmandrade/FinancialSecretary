@@ -8,7 +8,7 @@ export function registerDocsController(router: Router) {
     const url = new URL(ctx.req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
     const spec = buildOpenApiSpec(baseUrl);
-    return jsonResponse(spec, 200);
+    return jsonResponse(spec, { status: 200 });
   });
 
   router.get('/api/v1/docs', (ctx) => {

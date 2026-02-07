@@ -2,7 +2,7 @@ import type { RequestContext } from '../types/env';
 import { AppError } from '../lib/errors';
 
 export function requireUser(ctx: RequestContext) {
-  if (!ctx.user) throw new AppError('unauthorized', 401, 'Não autenticado.');
+  if (!ctx.user) throw new AppError(401, 'Não autenticado.',"Não autenticado");
   return ctx.user;
 }
 
